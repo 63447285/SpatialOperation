@@ -1,0 +1,11 @@
+{
+  "name": "js",
+  "version": "0.0.0",
+  "private": true,
+  "dependencies": {
+    "@geoman-io/leaflet-geoman-free": "^2.13.0",
+    "axios": "^0.27.2",
+    "jQuery": "^1.7.4",
+    "leaflet": "^1.8.0"
+  }
+}

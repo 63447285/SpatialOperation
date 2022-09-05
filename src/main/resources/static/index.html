@@ -1,0 +1,41 @@
+<head>
+<script src="https://unpkg.com/leaflet@1.7.0/dist/leaflet.js"></script>
+<script src='//api.tiles.mapbox.com/mapbox.js/plugins/leaflet-omnivore/v0.3.1/leaflet-omnivore.min.js'></script>
+<script src="https://unpkg.com/leaflet-canvas-marker@0.2.0"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script src="https://unpkg.com/@geoman-io/leaflet-geoman-free@latest/dist/leaflet-geoman.min.js"></script> 
+<link rel="stylesheet" href="https://unpkg.com/@geoman-io/leaflet-geoman-free@latest/dist/leaflet-geoman.css" />
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<!-- <script src="./index.js"></script>  -->
+<script src="https://cdn.bootcdn.net/ajax/libs/require.js/2.3.6/require.js"></script>
+</head>
+<div id="map"></div>
+<form action="http://localhost:8808/point/getByName" method="GET">
+  name: <input type="text" name="name">
+<input type="submit" value="Submit">
+</form>
+<button onclick="demo()">加载点</button>
+<script>
+
+function demo(){ 
+  var responsecontent;
+  const axios = require('axios').default;
+  // 向给定ID的用户发起请求
+  axios.get('http://localhost:8808/point/getByName?name=包子')
+    .then(function (response) {
+      // 处理成功情况
+      console.log(response);
+    })
+    .catch(function (error) {
+      // 处理错误情况
+      console.log(error);
+    })
+    .then(function () {
+      // 总是会执行
+      responsecontent=response.data.data;
+      document.write(Date());
+    });
+  }
+</script>
+
+
