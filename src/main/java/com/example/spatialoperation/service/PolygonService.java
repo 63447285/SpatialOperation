@@ -9,7 +9,6 @@ import com.vividsolutions.jts.io.WKTReader;
 import com.vividsolutions.jts.io.WKTWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,7 +44,7 @@ public class PolygonService {
      * @throws ParseException
      */
     public List<MyPolygon> getIntersectPolygons(String wkt) throws ParseException {
-        int count= polygonMapper.getPolygonsCount();
+        double count= polygonMapper.getPolygonsCount();
         List<MyPolygon> myPolygonList=new ArrayList<>();
         Geometry g1 = new WKTReader().read(wkt);
         for(int i=1;i<count+1;i++){
