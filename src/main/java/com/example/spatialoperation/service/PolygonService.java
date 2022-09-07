@@ -18,14 +18,21 @@ public class PolygonService {
     private PolygonMapper polygonMapper;
 
     public List<MyPolygon> getAllPolygon(){
+
         return polygonMapper.getAllPolygons();
     }
 
+    public List<String> getAllPolygonGeometry(){
+        return polygonMapper.getAllPolygonGeometry();
+    }
+
     public MyPolygon getPolygonByID(int id){
+
         return polygonMapper.getPolygonByID(id);
     }
 
     public List<MyPolygon> getPolygonByDlmc(String dlmc){
+
         return polygonMapper.getPolygonsByDlmc(dlmc);
     }
 

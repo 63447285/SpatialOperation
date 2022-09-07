@@ -21,6 +21,9 @@ public class PolygonController {
         return polygonService.getPolygonByID(id);
     };
 
+    @RequestMapping("/polygon/getAllPolygonGeometry")
+    public List<String> getAllPolygonGeometry(){return polygonService.getAllPolygonGeometry();};
+
     @RequestMapping("/polygon/getPolygonsGeometry")
     public String getPolygonGeometry(int id){
         return polygonService.getPolygonGeometry(id);
@@ -31,7 +34,7 @@ public class PolygonController {
         return polygonService.getIntersectPolygons(wkt);
     };
 
-    @RequestMapping("/getIntersectionClippingGeometrys")
+    @RequestMapping("/polygon/getIntersectionClippingGeometrys")
     public List<String> getIntersectionClippingGeometrys(String wkt) throws ParseException {
         return polygonService.getIntersectionClippingGeometry(wkt);
     }

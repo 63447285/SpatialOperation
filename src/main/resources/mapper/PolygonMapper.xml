@@ -4,6 +4,9 @@
     <select id="getAllPolygons" resultType="com.example.spatialoperation.entity.MyPolygon">
         SELECT * FROM dltb121604
     </select>
+    <select id="getAllPolygonGeometry" resultType="java.lang.String">
+        SELECT st_astext(gw_shape) FROM dltb121604
+    </select>
     <select id="getPolygonByID" resultType="com.example.spatialoperation.entity.MyPolygon">
         SELECT gw_objectcid,st_astext(gw_shape),dlmc FROM dltb121604 WHERE gw_objectcid=#{id}
     </select>

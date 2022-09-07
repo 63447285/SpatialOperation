@@ -4,19 +4,12 @@ import com.vividsolutions.jts.geom.Geometry;
 
 public class MyPolygon {
     private int objectid;
-    private Geometry shape;
+    private String shape;
 
-    private String wkt;
     private String dlmc;
 
 
-    public MyPolygon(int objectid, String wkt, String dlmc) {
-        this.objectid = objectid;
-        this.dlmc = dlmc;
-        this.wkt = wkt;
-    }
-
-    public MyPolygon(int objectid, Geometry shape, String dlmc) {
+    public MyPolygon(int objectid, String shape, String dlmc) {
         this.objectid = objectid;
         this.shape = shape;
         this.dlmc = dlmc;
@@ -30,11 +23,11 @@ public class MyPolygon {
         this.objectid = objectid;
     }
 
-    public Geometry getShape() {
+    public String getShape() {
         return shape;
     }
 
-    public void setShape(Geometry shape) {
+    public void setShape(String shape) {
         this.shape = shape;
     }
 

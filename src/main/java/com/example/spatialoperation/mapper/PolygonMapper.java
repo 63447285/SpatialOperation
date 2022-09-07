@@ -11,6 +11,8 @@ public interface PolygonMapper {
 
     MyPolygon getPolygonByID(@Param("id") int id);
 
+    List<String> getAllPolygonGeometry();
+
     List<String> getAllDlmc();
 
     List<MyPolygon> getPolygonsByDlmc(@Param("dlmc") String dlmc);
