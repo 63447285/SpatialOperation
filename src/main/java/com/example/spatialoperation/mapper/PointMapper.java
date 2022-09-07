@@ -14,6 +14,8 @@ public interface PointMapper {
 
     List<MyPoint> getPointByName(@Param("name") String name);
 
+
+
     String getPointGeometry(@Param("id") int id);
 
     List<MyPoint> getAll();

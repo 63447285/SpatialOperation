@@ -31,10 +31,7 @@ public class PolygonService {
         return polygonMapper.getPolygonByID(id);
     }
 
-    public List<MyPolygon> getPolygonByDlmc(String dlmc){
 
-        return polygonMapper.getPolygonsByDlmc(dlmc);
-    }
 
     public List<String> getAllDlmc(){
         return polygonMapper.getAllDlmc();
@@ -94,11 +91,11 @@ public class PolygonService {
      * @throws ParseException
      */
     public String getUnionGeometry(String dlmc) throws ParseException {
-        int count= polygonMapper.getPolygonsCount();
-        String wkt="";
-        Geometry geometry=new WKTReader().read(polygonMapper.getPolygonGeometry(1));
-        for(int i=1;i<count+1;i++){
-            geometry=geometry.union(new WKTReader().read(polygonMapper.getPolygonGeometry(i)));
+        List<String> wktList=polygonMapper.getPolygonsGeometryByDlmc(dlmc);
+
+        Geometry geometry=new WKTReader().read(wktList.get(0));
+        for(int i=1;i<wktList.size();i++){
+            geometry=geometry.union(new WKTReader().read(wktList.get(i)));
             }
         WKTWriter writer = new WKTWriter(2);
         String wkt2 = writer.write(geometry);

@@ -10,8 +10,8 @@
     <select id="getPolygonByID" resultType="com.example.spatialoperation.entity.MyPolygon">
         SELECT gw_objectcid,st_astext(gw_shape),dlmc FROM dltb121604 WHERE gw_objectcid=#{id}
     </select>
-    <select id="getPolygonsByDlmc" resultType="com.example.spatialoperation.entity.MyPolygon">
-        SELECT gw_objectcid,st_astext(gw_shape),dlmc FROM dltb121604 WHERE dlmc=#{dlmc}
+    <select id="getPolygonsGeometryByDlmc" resultType="java.lang.String">
+        SELECT st_astext(gw_shape) FROM dltb121604 WHERE dlmc=#{dlmc}
     </select>
     <select id="getAllDlmc" parameterType="java.lang.String">
         SELECT dlmc FROM dltb121604
