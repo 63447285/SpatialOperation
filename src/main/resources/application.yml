@@ -8,4 +8,8 @@ spring:
     password: szN5$weQ2CiM
 mybatis:
   mapper-locations: classpath:mapper/*.xml
+logging:
+  config: classpath:log4j.xml
+
+
 

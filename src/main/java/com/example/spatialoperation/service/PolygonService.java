@@ -7,8 +7,13 @@ import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.io.ParseException;
 import com.vividsolutions.jts.io.WKTReader;
 import com.vividsolutions.jts.io.WKTWriter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StopWatch;
+
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,20 +22,25 @@ public class PolygonService {
     @Autowired
     private PolygonMapper polygonMapper;
 
+    private static Logger log = LoggerFactory.getLogger(PolygonService.class);
     public List<MyPolygon> getAllPolygon(){
 
         return polygonMapper.getAllPolygons();
     }
 
     public List<String> getAllPolygonGeometry(){
-        return polygonMapper.getAllPolygonGeometry();
+        StopWatch watch = new StopWatch();
+        watch.start();
+        List<String> PolygonGeometrys=polygonMapper.getAllPolygonGeometry();
+        watch.stop();
+        log.info("获取所有多边形耗时：{} s", new DecimalFormat("#.000").format(watch.getTotalTimeSeconds()));
+        return PolygonGeometrys;
     }
 
     public MyPolygon getPolygonByID(int id){
 
         return polygonMapper.getPolygonByID(id);
     }
-
 
 
     public List<String> getAllDlmc(){
@@ -48,6 +58,8 @@ public class PolygonService {
      * @throws ParseException
      */
     public List<MyPolygon> getIntersectPolygons(String wkt) throws ParseException {
+        StopWatch watch = new StopWatch();
+        watch.start();
         double count= polygonMapper.getPolygonsCount();
         List<MyPolygon> myPolygonList=new ArrayList<>();
         Geometry g1 = new WKTReader().read(wkt);
@@ -56,6 +68,8 @@ public class PolygonService {
                     myPolygonList.add(polygonMapper.getPolygonByID(i));
             }
         }
+        watch.stop();
+        log.info("多边形相交耗时：{} s", new DecimalFormat("#.000").format(watch.getTotalTimeSeconds()));
         return myPolygonList;
     }
 
@@ -66,6 +80,8 @@ public class PolygonService {
      * @throws ParseException
      */
     public List<String> getIntersectionClippingGeometry(String wkt) throws ParseException {
+        StopWatch watch = new StopWatch();
+        watch.start();
         int count= polygonMapper.getPolygonsCount();
         List<Geometry> geometryList=new ArrayList<>();
         List<String> wktList=new ArrayList<>();
@@ -81,6 +97,8 @@ public class PolygonService {
                 wktList.add(wkt2);
             }
         }
+        watch.stop();
+        log.info("多边形裁剪耗时：{} s", new DecimalFormat("#.000").format(watch.getTotalTimeSeconds()));
         return wktList;
     }
 
@@ -91,15 +109,18 @@ public class PolygonService {
      * @throws ParseException
      */
     public String getUnionGeometry(String dlmc) throws ParseException {
+        StopWatch watch = new StopWatch();
+        watch.start();
         List<String> wktList=polygonMapper.getPolygonsGeometryByDlmc(dlmc);
-
         Geometry geometry=new WKTReader().read(wktList.get(0));
+        String count= String.valueOf(wktList.size());
         for(int i=1;i<wktList.size();i++){
             geometry=geometry.union(new WKTReader().read(wktList.get(i)));
             }
         WKTWriter writer = new WKTWriter(2);
-        String wkt2 = writer.write(geometry);
-        return wkt2;
+        watch.stop();
+        log.info("用地类型为"+dlmc+"的多边形有"+count+"个，合并耗时：{} s", new DecimalFormat("#.000").format(watch.getTotalTimeSeconds()));
+        return writer.write(geometry);
     }
 
 }

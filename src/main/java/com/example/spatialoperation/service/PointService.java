@@ -11,14 +11,19 @@ import com.vividsolutions.jts.io.ParseException;
 import com.vividsolutions.jts.io.WKTReader;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StopWatch;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class PointService {
+    private static Logger log = LoggerFactory.getLogger(PolygonService.class);
     @Autowired
     private PointMapper pointMapper;
 
@@ -27,7 +32,12 @@ public class PointService {
     }
 
     public List<MyPoint> getPointByName(String name){
-        return pointMapper.getPointByName(name);
+        StopWatch watch = new StopWatch();
+        watch.start();
+        List<MyPoint> myPointList= pointMapper.getPointByName(name);
+        watch.stop();
+        log.info("获取所有名字包含"+name+"的店耗时：{} s", new DecimalFormat("#.000").format(watch.getTotalTimeSeconds()));
+        return myPointList;
     }
 
     public String getPointGeometry(int id){
@@ -40,6 +50,8 @@ public class PointService {
      * @return 返回输入点500米以内的点集合
      */
     public List<MyPoint> getPointsByBuffer(String wkt) {
+        StopWatch watch = new StopWatch();
+        watch.start();
         int count= pointMapper.getPointsCount();
         double distance=500.0;
         List<MyPoint> myPointList=new ArrayList<>();
@@ -51,6 +63,8 @@ public class PointService {
                     myPointList.add(pointMapper.getPointByID(i));
                 }
             }
+            watch.stop();
+            log.info("获取500米内的点耗时：{} s", new DecimalFormat("#.000").format(watch.getTotalTimeSeconds()));
             return myPointList;
         } catch (ParseException e) {
             throw new RuntimeException(e);
@@ -63,6 +77,8 @@ public class PointService {
      * @return 返回在所绘制多边形内的点集
      */
     public List<MyPoint> getPointsByPolygon(String wkt){
+        StopWatch watch = new StopWatch();
+        watch.start();
         int count= pointMapper.getPointsCount();
         List<MyPoint> myPointList=new ArrayList<>();
         try {
@@ -72,6 +88,8 @@ public class PointService {
                     myPointList.add(pointMapper.getPointByID(i));
                 }
             }
+            watch.stop();
+            log.info("获取多边形内的点耗时：{} s", new DecimalFormat("#.000").format(watch.getTotalTimeSeconds()));
             return myPointList;
         } catch (ParseException e) {
             throw new RuntimeException(e);

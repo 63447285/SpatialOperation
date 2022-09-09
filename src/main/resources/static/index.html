@@ -8,7 +8,6 @@
           crossorigin=""></script>
     <script src="https://unpkg.com/leaflet@1.7.0/dist/leaflet.js"></script>
     <script src='//api.tiles.mapbox.com/mapbox.js/plugins/leaflet-omnivore/v0.3.1/leaflet-omnivore.min.js'></script>
-    <script src="https://unpkg.com/leaflet-canvas-marker@0.2.0"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="https://unpkg.com/@geoman-io/leaflet-geoman-free@latest/dist/leaflet-geoman.min.js"></script>
     <link rel="stylesheet" href="https://unpkg.com/@geoman-io/leaflet-geoman-free@latest/dist/leaflet-geoman.css"/>
@@ -16,6 +15,7 @@
     <script src="https://unpkg.com/terraformer@1.0.8"></script>
     <script src="https://unpkg.com/terraformer-arcgis-parser@1.0.5"></script>
     <script src="https://unpkg.com/terraformer-wkt-parser@1.1.2"></script>
+    <script src="https://unpkg.com/leaflet-canvas-marker@0.2.0"></script>
   <style>
 		html, body {
 			height: 100%;
@@ -23,7 +23,7 @@
 		}
 		.leaflet-container {
 			height: 500px;
-			width: 680px;
+			width: 850px;
 			max-width: 100%;
 			max-height: 100%;
 		}
@@ -35,7 +35,10 @@
 <!--<input type="submit" value="Submit">-->
 <!--</form>-->
 名称: <input type="text" id="field1">
-<button>加载点</button>
+<button>名称查询</button>
+<button>缓冲区查询</button>
+<button>包含查询</button><br/>
+<br/>
 <button id="submit" onclick="loadWkt();">Load WKT into Map</button>
 <button>相交</button>
 <button>裁剪</button>
@@ -51,21 +54,39 @@ var osm = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
 });
 var streets = L.tileLayer(mbUrl, {id: 'mapbox/streets-v11', tileSize: 512, zoomOffset: -1, attribution: mbAttr});
 
-const svg = '<svg t="1621166776642" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1407" width="200" height="200"><path d="M512 85.333333c-164.949333 0-298.666667 133.738667-298.666667 298.666667 0 164.949333 298.666667 554.666667 298.666667 554.666667s298.666667-389.717333 298.666667-554.666667c0-164.928-133.717333-298.666667-298.666667-298.666667z m0 448a149.333333 149.333333 0 1 1 0-298.666666 149.333333 149.333333 0 0 1 0 298.666666z" fill="#FF3D00" p-id="1408"></path></svg>'
+const redsvg='<svg t="1621166776642" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1407" width="200" height="200"><path d="M512 85.333333c-164.949333 0-298.666667 133.738667-298.666667 298.666667 0 164.949333 298.666667 554.666667 298.666667 554.666667s298.666667-389.717333 298.666667-554.666667c0-164.928-133.717333-298.666667-298.666667-298.666667z m0 448a149.333333 149.333333 0 1 1 0-298.666666 149.333333 149.333333 0 0 1 0 298.666666z" fill="#FF3D00" p-id="1408"></path></svg>';
 
-var greenIcon = L.icon({
-  iconUrl: 'data:image/svg+xml,' + encodeURIComponent(svg),
+const greensvg='<svg t="1662687226503" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2848" width="200" height="200"><path d="M512 85.333333c-164.949333 0-298.666667 133.738667-298.666667 298.666667 0 164.949333 298.666667 554.666667 298.666667 554.666667s298.666667-389.717333 298.666667-554.666667c0-164.928-133.717333-298.666667-298.666667-298.666667z m0 448a149.333333 149.333333 0 1 1 0-298.666666 149.333333 149.333333 0 0 1 0 298.666666z" fill="#1afa29" p-id="2849"></path></svg>';
+
+const yellowsvg='<svg t="1662687226503" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2848" width="200" height="200"><path d="M512 85.333333c-164.949333 0-298.666667 133.738667-298.666667 298.666667 0 164.949333 298.666667 554.666667 298.666667 554.666667s298.666667-389.717333 298.666667-554.666667c0-164.928-133.717333-298.666667-298.666667-298.666667z m0 448a149.333333 149.333333 0 1 1 0-298.666666 149.333333 149.333333 0 0 1 0 298.666666z" fill="#f4ea2a" p-id="2849"></path></svg>';
+
+var redIcon = L.icon({
+  iconUrl: 'data:image/svg+xml,' + encodeURIComponent(redsvg),
   iconSize: [32,32],
   iconAnchor: [16,32]
 });
 
-L.Marker.prototype.options.icon = greenIcon;
+var greenIcon = L.icon({
+  iconUrl: 'data:image/svg+xml,' + encodeURIComponent(greensvg),
+  iconSize: [32,32],
+  iconAnchor: [16,32]
+});
+
+var yellowIcon = L.icon({
+  iconUrl: 'data:image/svg+xml,' + encodeURIComponent(yellowsvg),
+  iconSize: [32,32],
+  iconAnchor: [16,32]
+});
+
+L.Marker.prototype.options.icon = redIcon;
 
 var littleton = L.marker([39.8492789996262, 116.331205999857]).bindPopup('铁路卫生学校食堂'),
     denver    = L.marker([39.8496379999938,116.600583999952]).bindPopup('吴记全羊汤'),
     aurora    = L.marker([40.009848, 116.395892]).bindPopup('This is A'),
     golden    = L.marker([39.929931, 116.475494]).bindPopup('This is B'),
     demo      = L.marker([36.929931, 118.475494]).bindPopup('This is demo');
+
+
 var cities = L.layerGroup([littleton, denver, aurora, golden]);
 var myPolygons =L.layerGroup();
 
@@ -103,7 +124,7 @@ layerControl.addOverlay(parks, "Parks");
 <!-- var latlngs = [[38, 116],[42.8511870003798, 117],[40,118.391130999696],[37, 116.5]];-->
 <!-- var polygon = L.polygon(latlngs, {color: 'blue'}).addTo(map);-->
 
-var geoJsonPoint=omnivore.wkt.parse('POINT (116.397411 39.909186)').addTo(map);
+<!--var geoJsonPoint=omnivore.wkt.parse('POINT (116.397411 39.909186)').addTo(map);-->
 
 var myStyle = {
     "color": "#ff7800",
@@ -129,7 +150,17 @@ var myStyle3 = {
     "opacity": 0.65
 };
 
+var geojsonMarkerOptions = {
+    radius: 500,
+    fillColor: "#ff7800",
+    color: "#000",
+    weight: 1,
+    opacity: 1,
+    fillOpacity: 0.8
+};
+
 function loadWkt() {
+map.setView([29.6718250536667, 91.147708283], 10);
     axios({
     method:'GET',
     url:'http://localhost:8808/polygon/getAllPolygonGeometry',
@@ -144,6 +175,7 @@ function loadWkt() {
                 style: myStyle,
                 onEachFeature: onEachFeature
             }).addTo(map);
+
         function onEachFeature(feature, layer) {
             var popupContent = "<p>Leaflet Load WKT " +
                 feature.type + "</p>";
@@ -160,8 +192,9 @@ var myGeoJSON;
 var wktString;
 
 map.on('pm:create',e=>{
+    console.log(e);
 	myGeoJSON = e.layer.toGeoJSON();
-	console.log(e.layer.getLatLngs());
+<!--	console.log(e.layer.getLatLngs());-->
 	wktString= Terraformer.WKT.convert(myGeoJSON.geometry);
     console.log(wktString);
 });
@@ -184,11 +217,8 @@ var pointname=document.getElementById("field1").value;
   }).then(response=>{
     console.log(response);
 var ciLayer = L.canvasIconLayer({}).addTo(map);
-     var icon = L.icon({
-      iconUrl: 'https://ejuke.github.io/Leaflet.Canvas-Markers/examples/img/pothole.png',
-       iconSize: [20, 18],
-       iconAnchor: [10, 9]
-     });
+var icon = redIcon;
+
 for (var i = 0; i < response.data.length; i++) {
        var lat = response.data[i].y;
        var lng = response.data[i].x;
@@ -198,8 +228,49 @@ for (var i = 0; i < response.data.length; i++) {
      }
   });
 }
-//相交
+//点缓冲区查询
+btns[1].onclick=function(){
+L.geoJSON(myGeoJSON, {
+    pointToLayer: function (feature, latlng) {
+        return L.circle(latlng, geojsonMarkerOptions);
+    }
+}).addTo(map);
+  axios({
+    method:'GET',
+    url:'http://localhost:8808/point/getPointsByBuffer?wkt='+wktString,
+  }).then(response=>{
+    console.log(response);
+var ciLayer = L.canvasIconLayer({}).addTo(map);
+var icon = greenIcon;
+for (var i = 0; i < response.data.length; i++) {
+       var lat = response.data[i].y;
+       var lng = response.data[i].x;
+       var marker = L.marker([lat, lng], { icon: icon })
+         .bindPopup(response.data[i].name);    //绑定气泡窗口
+      ciLayer.addLayer(marker);
+     }
+  });
+}
+//点空间包含查询
 btns[2].onclick=function(){
+  axios({
+    method:'GET',
+    url:'http://localhost:8808/point/getPointsByPolygon?wkt='+wktString,
+  }).then(response=>{
+    console.log(response);
+var ciLayer = L.canvasIconLayer({}).addTo(map);
+var icon = yellowIcon;
+for (var i = 0; i < response.data.length; i++) {
+       var lat = response.data[i].y;
+       var lng = response.data[i].x;
+       var marker = L.marker([lat, lng], { icon: icon })
+         .bindPopup(response.data[i].name);    //绑定气泡窗口
+      ciLayer.addLayer(marker);
+     }
+  });
+}
+//多边形相交
+btns[4].onclick=function(){
   axios({
     method:'GET',
     url:'http://localhost:8808/polygon/getIntersectPolygons?wkt='+wktString,
@@ -224,8 +295,8 @@ btns[2].onclick=function(){
         }
   });
 }
-//裁剪
-btns[3].onclick=function(){
+//多边形裁剪
+btns[5].onclick=function(){
   axios({
     method:'GET',
     url:'http://localhost:8808/polygon/getIntersectionClippingGeometrys?wkt='+wktString,
@@ -250,8 +321,8 @@ btns[3].onclick=function(){
         }
   });
 }
-//合并
-btns[4].onclick=function(){
+//多边形合并
+btns[6].onclick=function(){
 var dlmc=document.getElementById("field2").value;
   axios({
     method:'GET',
