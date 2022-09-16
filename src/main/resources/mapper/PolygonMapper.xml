@@ -4,8 +4,8 @@
     <select id="getAllPolygons" resultType="com.example.spatialoperation.entity.MyPolygon">
         SELECT * FROM dltb121604
     </select>
-    <select id="getAllPolygonGeometry" resultType="java.lang.String">
-        SELECT st_astext(gw_shape) FROM dltb121604
+    <select id="getAllPolygonGeometry" fetchSize="1000" resultType="java.lang.String">
+        SELECT ST_AsText(shape) FROM dltb2019 LIMIT #{num} OFFSET #{index}
     </select>
     <select id="getPolygonByID" resultType="com.example.spatialoperation.entity.MyPolygon">
         SELECT gw_objectcid,st_astext(gw_shape),dlmc FROM dltb121604 WHERE gw_objectcid=#{id}
@@ -22,4 +22,8 @@
     <select id="getPolygonGeometry" resultType="String">
         SELECT st_astext(gw_shape) From dltb121604 WHERE gw_objectcid=#{id}
     </select>
+    <select id="getPolygonByIntersects" resultType="java.lang.String">
+        SELECT st_astext(shape) FROM dltb2019 WHERE ST_Intersects(CAST(shape AS geometry), CAST('SRID=4490;'||#{wkt} AS geometry)) LIMIT #{num} OFFSET #{index}
+    </select>
+
 </mapper>

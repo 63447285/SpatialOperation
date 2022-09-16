@@ -32,7 +32,10 @@ public class SpatialOperationApplication {
 
     public static void main(String[] args) throws IOException {
         SpringApplication.run(SpatialOperationApplication.class, args);
-
+        long max=Runtime.getRuntime().maxMemory();
+        long total=Runtime.getRuntime().totalMemory();
+        System.out.println("虚拟机试图使用的最大内存量："+max/1024/1024+"mb");
+        System.out.println("虚拟机内存总量："+total/1024/1024+"mb");
     }
 
 

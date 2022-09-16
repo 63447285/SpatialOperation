@@ -34,6 +34,10 @@ public class PointController {
         return pointService.getPointsByBuffer(wkt);
     };
 
+    @RequestMapping("/point/getPointsByDistance")
+    public List<MyPoint> getPointsByDistance(String wkt){
+        return pointService.getPointsByDistance(wkt);
+    };
     @RequestMapping("/point/getPointsByPolygon")
     public List<MyPoint> getPointsByPloygon(String wkt){
         return pointService.getPointsByPolygon(wkt);

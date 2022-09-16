@@ -71,6 +71,19 @@ public class PointService {
         }
     }
 
+
+    public List<MyPoint> getPointsByDistance(String wkt) {
+        StopWatch watch = new StopWatch();
+        watch.start();
+        int count= pointMapper.getPointsCount();
+        double distance=500.0;
+        List<MyPoint> myPointList=new ArrayList<>();
+        myPointList=pointMapper.getPointsByDistance(wkt);
+        watch.stop();
+        log.info("获取500米内的点耗时：{} s", new DecimalFormat("#.000").format(watch.getTotalTimeSeconds()));
+        return myPointList;
+    }
+
     /**
      *
      * @param wkt

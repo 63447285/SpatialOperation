@@ -273,12 +273,12 @@ for (var i = 0; i < response.data.length; i++) {
 btns[4].onclick=function(){
   axios({
     method:'GET',
-    url:'http://localhost:8808/polygon/getIntersectPolygons?wkt='+wktString,
+    url:'http://localhost:8808/polygon/getPolygonByIntersects?wkt='+wktString,
   }).then(response=>{
     console.log(response);
     var geojsons = []
             for (var i = 0; i < response.data.length; i++) {
-                var geojson = Terraformer.WKT.parse(response.data[i].shape);
+                var geojson = Terraformer.WKT.parse(response.data[i]);
                 geojsons.push(geojson)
             }
             var layer = L.geoJson(geojsons, {
@@ -299,7 +299,7 @@ btns[4].onclick=function(){
 btns[5].onclick=function(){
   axios({
     method:'GET',
-    url:'http://localhost:8808/polygon/getIntersectionClippingGeometrys?wkt='+wktString,
+    url:'http://localhost:8808/polygon/getPolygonByIntersectionClipping?wkt='+wktString,
   }).then(response=>{
     console.log(response);
     var geojsons = []

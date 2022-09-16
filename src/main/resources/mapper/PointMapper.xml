@@ -16,4 +16,9 @@
     <select id="getPointGeometry" resultType="String">
         SELECT st_astext(shape) From meishi WHERE objectid=#{id}
     </select>
+    <select id="getPointsByDistance" resultType="com.example.spatialoperation.entity.MyPoint">
+        SELECT objectid,shape,name,address,x,y
+        FROM meishi
+        WHERE ST_DWithin( shape, 'SRID=4490;'+#{wkt}, 500 ,true)
+    </select>
 </mapper>

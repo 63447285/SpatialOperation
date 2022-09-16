@@ -11,7 +11,7 @@ public interface PolygonMapper {
 
     MyPolygon getPolygonByID(@Param("id") int id);
 
-    List<String> getAllPolygonGeometry();
+    List<String> getAllPolygonGeometry(@Param("index") int index,@Param("num") int num);
 
     List<String> getAllDlmc();
 
@@ -23,7 +23,10 @@ public interface PolygonMapper {
 
     String getPolygonGeometry(@Param("id") int id);
 
+    //新
+    List<String> getPolygonByIntersects(@Param("wkt") String wkt,@Param("index") int index,@Param("num") int num);
 
+    List<MyPolygon> getPolygonByIntersectionClipping(@Param("wkt") String wkt);
 
 
 

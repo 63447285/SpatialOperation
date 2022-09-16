@@ -2,6 +2,9 @@ package com.example.spatialoperation.service;
 
 import com.example.spatialoperation.entity.MyPolygon;
 import com.example.spatialoperation.mapper.PolygonMapper;
+import com.example.spatialoperation.myCallable.SelectDataCallable;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.io.ParseException;
@@ -28,12 +31,12 @@ public class PolygonService {
         return polygonMapper.getAllPolygons();
     }
 
-    public List<String> getAllPolygonGeometry(){
+    public List<String> getAllPolygonGeometryByGroup(int index,int num){
         StopWatch watch = new StopWatch();
         watch.start();
-        List<String> PolygonGeometrys=polygonMapper.getAllPolygonGeometry();
+        List<String> PolygonGeometrys=polygonMapper.getAllPolygonGeometry(index,num);
         watch.stop();
-        log.info("获取所有多边形耗时：{} s", new DecimalFormat("#.000").format(watch.getTotalTimeSeconds()));
+        log.info("获取到"+ PolygonGeometrys.size() +"个多边形耗时：{} s", new DecimalFormat("#.000").format(watch.getTotalTimeSeconds()));
         return PolygonGeometrys;
     }
 
@@ -122,5 +125,38 @@ public class PolygonService {
         log.info("用地类型为"+dlmc+"的多边形有"+count+"个，合并耗时：{} s", new DecimalFormat("#.000").format(watch.getTotalTimeSeconds()));
         return writer.write(geometry);
     }
+
+    //新方法
+    public List<String> getPolygonByIntersects(String wkt,int index,int num){
+        StopWatch watch = new StopWatch();
+        watch.start();
+        List<String> myPolygonList=polygonMapper.getPolygonByIntersects(wkt,index,num);
+        watch.stop();
+        log.info("使用空间索引语句多边形相交耗时：{} s", new DecimalFormat("#.000").format(watch.getTotalTimeSeconds()));
+        return myPolygonList;
+    }
+
+//    public List<String> getPolygonByIntersectionClipping(String wkt) throws ParseException {
+//        StopWatch watch = new StopWatch();
+//        watch.start();
+//        List<Geometry> geometryList=new ArrayList<>();
+//        List<MyPolygon> myPolygonList=polygonMapper.getPolygonByIntersects(wkt);
+//        List<String> wktList=new ArrayList<>();
+//        Geometry g1 = new WKTReader().read(wkt);
+//        Geometry g2 = null;
+//        for(int i=0;i<myPolygonList.size();i++){
+//            g2=new WKTReader().read(myPolygonList.get(i).getShape());
+//            Geometry g= g1.intersection(g2);
+//            geometryList.add(g);
+//            WKTWriter writer = new WKTWriter(2);
+//            String wkt2 = writer.write(g);
+//            wktList.add(wkt2);
+//        }
+//        watch.stop();
+//        log.info("使用空间索引语句多边形裁剪耗时：{} s", new DecimalFormat("#.000").format(watch.getTotalTimeSeconds()));
+//        return wktList;
+//    }
+
+
 
 }
