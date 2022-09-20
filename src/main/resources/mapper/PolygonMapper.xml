@@ -1,29 +1,22 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.spatialoperation.mapper.PolygonMapper">
-    <select id="getAllPolygons" resultType="com.example.spatialoperation.entity.MyPolygon">
-        SELECT * FROM dltb121604
-    </select>
     <select id="getAllPolygonGeometry" fetchSize="1000" resultType="java.lang.String">
         SELECT ST_AsText(shape) FROM dltb2019 LIMIT #{num} OFFSET #{index}
     </select>
-    <select id="getPolygonByID" resultType="com.example.spatialoperation.entity.MyPolygon">
+    <select id="getMyPolygonByID" resultType="com.example.spatialoperation.entity.MyPolygon">
         SELECT gw_objectcid,st_astext(gw_shape),dlmc FROM dltb121604 WHERE gw_objectcid=#{id}
     </select>
     <select id="getPolygonsGeometryByDlmc" resultType="java.lang.String">
         SELECT st_astext(gw_shape) FROM dltb121604 WHERE dlmc=#{dlmc}
     </select>
-    <select id="getAllDlmc" parameterType="java.lang.String">
-        SELECT dlmc FROM dltb121604
-    </select>
-    <select id="getPolygonsCount" resultType="int">
-        SELECT COUNT(*) FROM dltb121604
-    </select>
-    <select id="getPolygonGeometry" resultType="String">
-        SELECT st_astext(gw_shape) From dltb121604 WHERE gw_objectcid=#{id}
-    </select>
-    <select id="getPolygonByIntersects" resultType="java.lang.String">
+    <select id="getPolygonByIntersects" fetchSize="10000" resultType="java.lang.String">
         SELECT st_astext(shape) FROM dltb2019 WHERE ST_Intersects(CAST(shape AS geometry), CAST('SRID=4490;'||#{wkt} AS geometry)) LIMIT #{num} OFFSET #{index}
     </select>
-
+    <select id="getPolygonByClipping" fetchSize="100" resultType="java.lang.String">
+        SELECT st_astext(ST_Intersection(CAST(shape AS geometry), CAST('SRID=4490;'||#{wkt} AS geometry))) FROM dltb2019 WHERE ST_Intersects(CAST(shape AS geometry), CAST('SRID=4490;'||#{wkt} AS geometry)) LIMIT #{num} OFFSET #{index}
+    </select>
+    <select id="getPolygonByUnion" fetchSize="10000" resultType="java.lang.String">
+        SELECT st_astext(ST_Union(ST_Buffer(shape,0.001))) FROM dltb2019 WHERE dlmc=#{dlmc} LIMIT #{num} OFFSET #{index}
+    </select>
 </mapper>

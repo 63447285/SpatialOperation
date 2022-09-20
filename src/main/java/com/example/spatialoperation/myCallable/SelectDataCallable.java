@@ -14,7 +14,6 @@ public class SelectDataCallable  implements Callable<List<String>> {
 
     public SelectDataCallable(PolygonService polygonService,int bindex,int num) {
         this.polygonService = polygonService;
-
         this.bindex=bindex;
         this.num=num;
     }

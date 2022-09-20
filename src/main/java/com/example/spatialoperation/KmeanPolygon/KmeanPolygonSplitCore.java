@@ -5,10 +5,12 @@ import java.util.List;
 
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.Polygon;
 import org.locationtech.jts.io.ParseException;
-import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.io.WKTReader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class KmeanPolygonSplitCore implements KmeanPolygonSplitInterface{
@@ -17,10 +19,17 @@ public class KmeanPolygonSplitCore implements KmeanPolygonSplitInterface{
         return d;
     }
 
+    private static Logger log = LoggerFactory.getLogger(KmeanPolygonSplitCore.class);
     @Override
-    public KmeanPolygonResult splitPolygon(String wkt, int setp, int k) throws ParseException {
+    public KmeanPolygonResult splitPolygon(String wkt, int setp, int k) {
         KmeanPolygonResult result = new KmeanPolygonResult();
-        Polygon polygon = (Polygon) new WKTReader().read(wkt);
+        Polygon polygon = null;
+        try {
+            polygon = (Polygon) new WKTReader().read(wkt);
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
+        log.info("传入wkt为"+wkt);
         Coordinate[] coordinates = polygon.getCoordinates();
         ArrayList<Double> xList = new ArrayList<>();
         ArrayList<Double> yList = new ArrayList<>();
@@ -45,7 +54,12 @@ public class KmeanPolygonSplitCore implements KmeanPolygonSplitInterface{
             if (pointCount <= setp) {
                 double rx = random(xMax, xMin);
                 double ry = random(yMax, yMin);
-                Point nowPoint = (Point) new WKTReader().read("POINT(" + rx + " " + ry + ")");
+                Point nowPoint = null;
+                try {
+                    nowPoint = (Point) new WKTReader().read("POINT(" + rx + " " + ry + ")");
+                } catch (ParseException e) {
+                    throw new RuntimeException(e);
+                }
                 boolean contains = polygon.contains(nowPoint);
                 if (contains) {
                     pointArrayList.add(nowPoint);
@@ -55,6 +69,7 @@ public class KmeanPolygonSplitCore implements KmeanPolygonSplitInterface{
                 break;
             }
         }
+        log.info("生成随机点的数量为"+pointArrayList.size());
         // k-means 数据 构造
         double[][] kmData = new double[pointArrayList.size()][2];
         for (int i = 0; i < pointArrayList.size(); i++) {
@@ -64,15 +79,15 @@ public class KmeanPolygonSplitCore implements KmeanPolygonSplitInterface{
             oneData[1] = point.getY();
             kmData[i] = oneData;
         }
-
+        log.info("k-means结果"+kmData.length);
         // k-means 结果
 
         Kmeans kmeans = new Kmeans(kmData, k);
-
+        log.info("kmeans"+kmeans.getCentroids());
         // 构造泰森多边形
-        VoronoiInterface vo = new VoronoiInterfaceImpl();
+        VoronoiInterfaceImpl vo = new VoronoiInterfaceImpl();
         List<Geometry> voronoi = vo.voronoi(kmeans.getCentroids());
-
+        log.info("构造泰森多边形结果");
         result.setPolygon(polygon);
         result.setPointList(pointArrayList);
         result.setAssignments(kmeans.getAssignments());
@@ -80,6 +95,7 @@ public class KmeanPolygonSplitCore implements KmeanPolygonSplitInterface{
         result.setXlist(xList);
         result.setYlist(yList);
         result.setVoronoi(voronoi);
+
         return result;
     }
 }

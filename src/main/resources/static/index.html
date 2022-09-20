@@ -160,7 +160,7 @@ var geojsonMarkerOptions = {
 };
 
 function loadWkt() {
-map.setView([29.6718250536667, 91.147708283], 10);
+map.setView([23.003908, 115.444301], 10);
     axios({
     method:'GET',
     url:'http://localhost:8808/polygon/getAllPolygonGeometry',
@@ -299,7 +299,7 @@ btns[4].onclick=function(){
 btns[5].onclick=function(){
   axios({
     method:'GET',
-    url:'http://localhost:8808/polygon/getPolygonByIntersectionClipping?wkt='+wktString,
+    url:'http://localhost:8808/polygon/getPolygonByClipping?wkt='+wktString,
   }).then(response=>{
     console.log(response);
     var geojsons = []
@@ -326,7 +326,7 @@ btns[6].onclick=function(){
 var dlmc=document.getElementById("field2").value;
   axios({
     method:'GET',
-    url:'http://localhost:8808/polygon/getUnionGeometry?dlmc='+dlmc,
+    url:'http://localhost:8808/polygon/getPolygonByUnion?dlmc='+dlmc,
   }).then(response=>{
     console.log(response);
     var geojsons = [];

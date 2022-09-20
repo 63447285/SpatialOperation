@@ -2,13 +2,12 @@ package com.example.spatialoperation.KmeanPolygon;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
 import org.geotools.geometry.jts.JTSFactoryFinder;
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.Envelope;
-import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.*;
 import org.locationtech.jts.triangulate.VoronoiDiagramBuilder;
 import org.locationtech.jts.triangulate.quadedge.QuadEdgeSubdivision;
+
 
 public class VoronoiInterfaceImpl implements VoronoiInterface{
     @Override
@@ -18,6 +17,7 @@ public class VoronoiInterfaceImpl implements VoronoiInterface{
 
     @Override
     public Collection delaunay(double[][] doubles) {
+
         return delaunay(doublesToCoordinate(doubles));
     }
 
@@ -39,6 +39,7 @@ public class VoronoiInterfaceImpl implements VoronoiInterface{
             Coordinate coord = new Coordinate(doubles[i][0], doubles[i][1], i);
             coords.add(coord);
         }
+
         return coords;
     }
 
@@ -48,31 +49,37 @@ public class VoronoiInterfaceImpl implements VoronoiInterface{
             Coordinate coord = new Coordinate(points.get(i).getX(), points.get(i).getY(), i);
             coords.add(coord);
         }
+
         return coords;
+
     }
 
     private VoronoiDiagramBuilder getVoronoiDiagramBuilder(List<Coordinate> coords) {
+
         VoronoiDiagramBuilder voronoiDiagramBuilder = new VoronoiDiagramBuilder();
         Envelope clipEnvelpoe = new Envelope();
         voronoiDiagramBuilder.setSites(coords);
         voronoiDiagramBuilder.setClipEnvelope(clipEnvelpoe);
+        System.out.println(voronoiDiagramBuilder.toString());
         return voronoiDiagramBuilder;
     }
 
 
     @Override
     public List<Geometry> voronoi(List<Coordinate> coords) {
-        VoronoiDiagramBuilder voronoiDiagramBuilder = getVoronoiDiagramBuilder(
-                coords);
-        Geometry geom = voronoiDiagramBuilder
-                .getDiagram(JTSFactoryFinder.getGeometryFactory());
-
+        VoronoiDiagramBuilder voronoiDiagramBuilder = getVoronoiDiagramBuilder(coords);
+        System.out.println("8888888888888888888888888888888888888");
+        GeometryFactory geometryFactory=new GeometryFactory();
+        Geometry geom = voronoiDiagramBuilder.getDiagram(JTSFactoryFinder.getGeometryFactory());
+        //Geometry geom = voronoiDiagramBuilder.getDiagram(geometryFactory);
+        System.out.println("************************");
         List<Geometry> voronoi = new ArrayList<>();
         int numGeometries = geom.getNumGeometries();
         for (int i = 0; i < numGeometries; i++) {
             Geometry geometryN = geom.getGeometryN(i);
             voronoi.add(geometryN);
         }
+
         return voronoi;
     }
 

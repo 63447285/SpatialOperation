@@ -46,5 +46,6 @@ public class Kmeans {
         this.assignments = assignments;
         double[][] centroids = eKmeans.getCentroids();
         this.centroids = centroids;
+
     }
 }
