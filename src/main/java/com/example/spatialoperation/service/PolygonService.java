@@ -219,6 +219,7 @@ public class PolygonService {
     }
 
 
-
-
+    public void insert(MyPolygon myPolygon) {
+        polygonMapper.insertPolygon(myPolygon);
+    }
 }

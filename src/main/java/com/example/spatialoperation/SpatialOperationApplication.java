@@ -16,9 +16,11 @@ import org.geotools.styling.SLD;
 import org.geotools.styling.Style;
 import org.geotools.swing.JMapFrame;
 import org.geotools.swing.data.JFileDataStoreChooser;
+import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,8 +28,8 @@ import java.io.InputStream;
 import java.sql.Connection;
 import java.util.List;
 import java.util.Map;
-
-@SpringBootApplication
+@MapperScan("com.example.spatialoperation.mapper")
+@SpringBootApplication(exclude = DataSourceAutoConfiguration.class)
 public class SpatialOperationApplication {
 
     public static void main(String[] args) throws IOException {

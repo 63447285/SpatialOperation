@@ -21,4 +21,5 @@ public interface PolygonMapper {
 
     String getPolygonByUnion(@Param("index") int index, @Param("num") int num,@Param("dlmc") String dlmc);
 
+    void insertPolygon(MyPolygon myPolygon);
 }

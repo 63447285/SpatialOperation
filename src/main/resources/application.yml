@@ -2,14 +2,20 @@ server:
   port: 8808
 spring:
   datasource:
-    driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://172.16.67.97:5432/msdb_kjk?
-    username: msdb_kjk
-    password: szN5$weQ2CiM
+    db1:
+      driver-class-name: org.postgresql.Driver
+      jdbc-url: jdbc:postgresql://172.16.67.97:5432/msdb_kjk?
+      username: msdb_kjk
+      password: szN5$weQ2CiM
+    db2:
+      driver-class-name: org.postgresql.Driver
+      jdbc-url: jdbc:postgresql://localhost:5432/postgres?
+      username: postgres
+      password: 63447285
 mybatis:
-  mapper-locations: classpath:mapper/*.xml
+    mapper-locations: classpath:mapper/*.xml
 logging:
-  config: classpath:log4j.xml
+    config: classpath:log4j.xml
 
 
 

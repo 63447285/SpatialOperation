@@ -19,4 +19,8 @@
     <select id="getPolygonByUnion" fetchSize="10000" resultType="java.lang.String">
         SELECT st_astext(ST_Union(ST_Buffer(shape,0.001))) FROM dltb2019 WHERE dlmc=#{dlmc} LIMIT #{num} OFFSET #{index}
     </select>
+    <insert id="insertPolygon" parameterType="com.example.spatialoperation.entity.MyPolygon">
+        INSERT INTO  dltb_intersect(objectid,shape,dlmc)
+        VALUES (#{objectid},st_geomfromtext(#{shape},4490),#{dlmc})
+    </insert>
 </mapper>

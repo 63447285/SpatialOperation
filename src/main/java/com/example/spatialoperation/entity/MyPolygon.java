@@ -1,10 +1,13 @@
 package com.example.spatialoperation.entity;
 
-import com.vividsolutions.jts.geom.Geometry;
+
+import org.locationtech.jts.geom.Geometry;
 
 public class MyPolygon {
     private int objectid;
     private String shape;
+
+
 
     private String dlmc;
 
@@ -14,6 +17,8 @@ public class MyPolygon {
         this.shape = shape;
         this.dlmc = dlmc;
     }
+
+
 
     public int getObjectid() {
         return objectid;
