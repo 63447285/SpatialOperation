@@ -2,23 +2,23 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.spatialoperation.mapper.PointMapper">
     <select id="getPointByID" resultType="com.example.spatialoperation.entity.MyPoint">
-        SELECT * FROM meishi WHERE objectid=#{id}
+        SELECT objectid,st_astext(shape),dlmc FROM dltb_points WHERE objectid=#{objectid}
     </select>
     <select id="getAll" resultType="com.example.spatialoperation.entity.MyPoint">
-        SELECT * FROM meishi
+        SELECT objectid,st_astext(shape),dlmc FROM dltb_points
     </select>
     <select id="getPointByName" resultType="com.example.spatialoperation.entity.MyPoint">
-        SELECT * FROM meishi WHERE name LIKE concat( '%' , #{name}, '%')
+        SELECT objectid,st_astext(shape),dlmc FROM dltb_points WHERE dlmc=#{dlmc}
     </select>
     <select id="getPointsCount" resultType="int">
-        SELECT COUNT(*) FROM meishi
+        SELECT COUNT(*) FROM dltb_points
     </select>
     <select id="getPointGeometry" resultType="String">
-        SELECT st_astext(shape) From meishi WHERE objectid=#{id}
+        SELECT st_astext(shape) From dltb_points WHERE objectid=#{objectid}
     </select>
     <select id="getPointsByDistance" resultType="com.example.spatialoperation.entity.MyPoint">
-        SELECT objectid,shape,name,address,x,y
-        FROM meishi
+        SELECT objectid,st_astext(shape),dlmc
+        FROM dltb_points
         WHERE ST_DWithin( shape, 'SRID=4490;'+#{wkt}, 500 ,true)
     </select>
 </mapper>

@@ -10,13 +10,13 @@ import java.util.List;
 @Mapper
 public interface PointMapper {
 
-    MyPoint getPointByID(@Param("id") int id);
+    MyPoint getPointByID(@Param("objectid") int objectid);
 
-    List<MyPoint> getPointByName(@Param("name") String name);
+    List<MyPoint> getPointByName(@Param("dlmc") String dlmc);
 
     List<MyPoint> getPointsByDistance(@Param("wkt") String wkt);
 
-    String getPointGeometry(@Param("id") int id);
+    String getPointGeometry(@Param("objectid") int objectid);
 
     List<MyPoint> getAll();
 

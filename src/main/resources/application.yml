@@ -4,12 +4,12 @@ spring:
   datasource:
     db1:
       driver-class-name: org.postgresql.Driver
-      jdbc-url: jdbc:postgresql://172.16.67.97:5432/msdb_kjk?
-      username: msdb_kjk
-      password: szN5$weQ2CiM
+      jdbc-url: jdbc:postgresql://172.16.83.176:5432/postgres?
+      username: postgres
+      password: 63447285
     db2:
       driver-class-name: org.postgresql.Driver
-      jdbc-url: jdbc:postgresql://localhost:5432/postgres?
+      jdbc-url: jdbc:postgresql://172.16.83.176:5432/postgres?
       username: postgres
       password: 63447285
 mybatis:

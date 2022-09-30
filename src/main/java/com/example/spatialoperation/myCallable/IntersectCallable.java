@@ -1,12 +1,13 @@
 package com.example.spatialoperation.myCallable;
 
+import com.example.spatialoperation.entity.MyPolygon;
 import com.example.spatialoperation.service.PolygonService;
 import com.vividsolutions.jts.io.ParseException;
 
 import java.util.List;
 import java.util.concurrent.Callable;
 
-public class IntersectCallable implements Callable<List<String>> {
+public class IntersectCallable implements Callable<List<MyPolygon>> {
     private PolygonService polygonService;
     private int bindex;//分页index
     private int num;//数量
@@ -23,7 +24,7 @@ public class IntersectCallable implements Callable<List<String>> {
     }
 
     @Override
-    public List<String> call() throws  org.locationtech.jts.io.ParseException {
+    public List<MyPolygon> call() throws  org.locationtech.jts.io.ParseException {
         return polygonService.getPolygonByIntersects(wkt,bindex,num);
 
     }

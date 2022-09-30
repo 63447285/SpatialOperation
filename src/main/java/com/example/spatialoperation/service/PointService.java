@@ -31,12 +31,12 @@ public class PointService {
         return pointMapper.getPointByID(id);
     }
 
-    public List<MyPoint> getPointByName(String name){
+    public List<MyPoint> getPointByName(String dlmc){
         StopWatch watch = new StopWatch();
         watch.start();
-        List<MyPoint> myPointList= pointMapper.getPointByName(name);
+        List<MyPoint> myPointList= pointMapper.getPointByName(dlmc);
         watch.stop();
-        log.info("获取所有名字包含"+name+"的店耗时：{} s", new DecimalFormat("#.000").format(watch.getTotalTimeSeconds()));
+        log.info("查询用地类型为"+dlmc+"耗时：{} s", new DecimalFormat("#.000").format(watch.getTotalTimeSeconds()));
         return myPointList;
     }
 
@@ -54,18 +54,19 @@ public class PointService {
         watch.start();
         int count= pointMapper.getPointsCount();
         double distance=500.0;
-        List<MyPoint> myPointList=new ArrayList<>();
+        List<MyPoint> myPointList=pointMapper.getAll();
+        List<MyPoint> result = new ArrayList<>();
         try {
             Geometry g1 = new WKTReader().read(wkt);
             Polygon g2 = (Polygon) g1.buffer( distance/(2 * Math.PI * 6371004) * 360);
-            for(int i=1;i<count+1;i++){
-                if(new WKTReader().read(pointMapper.getPointGeometry(i)).within(g2)){
-                    myPointList.add(pointMapper.getPointByID(i));
+            for(int i=0;i<myPointList.size();i++){
+                if(new WKTReader().read(myPointList.get(i).getShape()).within(g2)){
+                    result.add(myPointList.get(i));
                 }
             }
             watch.stop();
             log.info("获取500米内的点耗时：{} s", new DecimalFormat("#.000").format(watch.getTotalTimeSeconds()));
-            return myPointList;
+            return result;
         } catch (ParseException e) {
             throw new RuntimeException(e);
         }
@@ -92,18 +93,18 @@ public class PointService {
     public List<MyPoint> getPointsByPolygon(String wkt){
         StopWatch watch = new StopWatch();
         watch.start();
-        int count= pointMapper.getPointsCount();
-        List<MyPoint> myPointList=new ArrayList<>();
+        List<MyPoint> myPointList=pointMapper.getAll();
+        List<MyPoint> result = new ArrayList<>();
         try {
             Geometry g1 = new WKTReader().read(wkt);
-            for(int i=1;i<count+1;i++){
-                if(new WKTReader().read(pointMapper.getPointGeometry(i)).within(g1)){
-                    myPointList.add(pointMapper.getPointByID(i));
+            for(int i=0;i<myPointList.size();i++){
+                if(new WKTReader().read(myPointList.get(i).getShape()).within(g1)){
+                    result.add(myPointList.get(i));
                 }
             }
             watch.stop();
             log.info("获取多边形内的点耗时：{} s", new DecimalFormat("#.000").format(watch.getTotalTimeSeconds()));
-            return myPointList;
+            return result;
         } catch (ParseException e) {
             throw new RuntimeException(e);
         }

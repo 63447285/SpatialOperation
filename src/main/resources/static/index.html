@@ -39,6 +39,7 @@
 <button>缓冲区查询</button>
 <button>包含查询</button><br/>
 <br/>
+wkt: <input type="text" id="field3">
 <button id="submit" onclick="loadWkt();">Load WKT into Map</button>
 <button>相交</button>
 <button>裁剪</button>
@@ -91,12 +92,13 @@ var cities = L.layerGroup([littleton, denver, aurora, golden]);
 var myPolygons =L.layerGroup();
 
 var map = L.map('map', {
-  center: [39.905963, 116.390813],
+  center: [21.081083, 110.172729],
   zoom: 10,
   layers:[osm, cities],
   preferCanvas: true
 });
-map.setView([39.909186, 116.397411], 10);
+
+map.setView([21.280844, 110.220337], 8);
 
 var baseMaps = {
     "OpenStreetMap": osm,
@@ -118,13 +120,9 @@ var crownHill = L.marker([39.75, -105.09]).bindPopup('This is Crown Hill Park.')
 
 var parks = L.layerGroup([crownHill, rubyHill]);
 
-
 layerControl.addOverlay(parks, "Parks");
 
-<!-- var latlngs = [[38, 116],[42.8511870003798, 117],[40,118.391130999696],[37, 116.5]];-->
-<!-- var polygon = L.polygon(latlngs, {color: 'blue'}).addTo(map);-->
-
-<!--var geoJsonPoint=omnivore.wkt.parse('POINT (116.397411 39.909186)').addTo(map);-->
+var geoJsonPolygon=omnivore.wkt.parse('POLYGON ((109.663696 21.556987, 109.998779 22.00078, 110.603027 21.990593, 110.927124 21.434321, 110.509644 20.521359, 110.361328 20.315438, 109.910889 20.263915, 109.684245 20.995259, 109.663696 21.556987))').addTo(map);
 
 var myStyle = {
     "color": "#ff7800",
@@ -159,34 +157,6 @@ var geojsonMarkerOptions = {
     fillOpacity: 0.8
 };
 
-function loadWkt() {
-map.setView([23.003908, 115.444301], 10);
-    axios({
-    method:'GET',
-    url:'http://localhost:8808/polygon/getAllPolygonGeometry',
-  }).then(response=>{
-    console.log(response);
-    var geojsons = []
-            for (var i = 0; i < response.data.length; i++) {
-                var geojson = Terraformer.WKT.parse(response.data[i]);
-                geojsons.push(geojson)
-            }
-            var layer = L.geoJson(geojsons, {
-                style: myStyle,
-                onEachFeature: onEachFeature
-            }).addTo(map);
-
-        function onEachFeature(feature, layer) {
-            var popupContent = "<p>Leaflet Load WKT " +
-                feature.type + "</p>";
-            if (feature.properties && feature.properties.popupContent) {
-                popupContent += feature.properties.popupContent;
-            }
-            layer.bindPopup(popupContent);
-        }
-     });
-}
-
 var myGeoJSON;
 
 var wktString;
@@ -194,7 +164,6 @@ var wktString;
 map.on('pm:create',e=>{
     console.log(e);
 	myGeoJSON = e.layer.toGeoJSON();
-<!--	console.log(e.layer.getLatLngs());-->
 	wktString= Terraformer.WKT.convert(myGeoJSON.geometry);
     console.log(wktString);
 });
@@ -205,25 +174,32 @@ map.pm.addControls({
   drawCircle: false,
 });
 
+function loadWkt() {
+var wkt=document.getElementById("field3").value;
+var geojson = Terraformer.WKT.parse(wkt);
+var layer = L.geoJson(geojson, {
+               style: myStyle
+               }).addTo(map);
+        wktString= wkt;
+}
 
 
 const btns = document.querySelectorAll('button');
 //根据名称进行点查询
 btns[0].onclick=function(){
-var pointname=document.getElementById("field1").value;
+var dlmc=document.getElementById("field1").value;
   axios({
     method:'GET',
-    url:'http://localhost:8808/point/getByName?name='+pointname,
+    url:'http://172.16.83.176:8808/point/getByName?dlmc='+dlmc,
   }).then(response=>{
     console.log(response);
 var ciLayer = L.canvasIconLayer({}).addTo(map);
 var icon = redIcon;
-
 for (var i = 0; i < response.data.length; i++) {
-       var lat = response.data[i].y;
-       var lng = response.data[i].x;
-       var marker = L.marker([lat, lng], { icon: icon })
-         .bindPopup(response.data[i].name);    //绑定气泡窗口
+  var geojson = Terraformer.WKT.parse(response.data[i].shape);
+    var layer = L.geoJson(geojson, {});
+       var marker = L.marker(layer.getBounds().getCenter(), { icon: icon })
+         .bindPopup("id:"+response.data[i].objectid);    //绑定气泡窗口
       ciLayer.addLayer(marker);
      }
   });
@@ -237,16 +213,16 @@ L.geoJSON(myGeoJSON, {
 }).addTo(map);
   axios({
     method:'GET',
-    url:'http://localhost:8808/point/getPointsByBuffer?wkt='+wktString,
+    url:'http://172.16.83.176:8808/point/getPointsByBuffer?wkt='+wktString,
   }).then(response=>{
     console.log(response);
 var ciLayer = L.canvasIconLayer({}).addTo(map);
 var icon = greenIcon;
 for (var i = 0; i < response.data.length; i++) {
-       var lat = response.data[i].y;
-       var lng = response.data[i].x;
-       var marker = L.marker([lat, lng], { icon: icon })
-         .bindPopup(response.data[i].name);    //绑定气泡窗口
+       var geojson = Terraformer.WKT.parse(response.data[i].shape);
+    var layer = L.geoJson(geojson, {});
+       var marker = L.marker(layer.getBounds().getCenter(), { icon: icon })
+         .bindPopup("id:"+response.data[i].objectid);    //绑定气泡窗口
       ciLayer.addLayer(marker);
      }
   });
@@ -255,17 +231,17 @@ for (var i = 0; i < response.data.length; i++) {
 btns[2].onclick=function(){
   axios({
     method:'GET',
-    url:'http://localhost:8808/point/getPointsByPolygon?wkt='+wktString,
+    url:'http://172.16.83.176:8808/point/getPointsByPolygon?wkt='+wktString,
   }).then(response=>{
     console.log(response);
 var ciLayer = L.canvasIconLayer({}).addTo(map);
 var icon = yellowIcon;
 for (var i = 0; i < response.data.length; i++) {
-       var lat = response.data[i].y;
-       var lng = response.data[i].x;
-       var marker = L.marker([lat, lng], { icon: icon })
-         .bindPopup(response.data[i].name);    //绑定气泡窗口
-      ciLayer.addLayer(marker);
+    var geojson = Terraformer.WKT.parse(response.data[i].shape);
+    var layer = L.geoJson(geojson, {});
+    var marker = L.marker(layer.getBounds().getCenter(), { icon: icon })
+         .bindPopup("id:"+response.data[i].objectid);    //绑定气泡窗口
+     ciLayer.addLayer(marker);
      }
   });
 }
@@ -273,51 +249,115 @@ for (var i = 0; i < response.data.length; i++) {
 btns[4].onclick=function(){
   axios({
     method:'GET',
-    url:'http://localhost:8808/polygon/getPolygonByIntersects?wkt='+wktString,
+    url:'http://172.16.83.176:8808/polygon/getPolygonByIntersects?wkt='+wktString,
   }).then(response=>{
     console.log(response);
+    if(response.data.length<10000){
     var geojsons = []
             for (var i = 0; i < response.data.length; i++) {
-                var geojson = Terraformer.WKT.parse(response.data[i]);
-                geojsons.push(geojson)
+                var geojson = Terraformer.WKT.parse(response.data[i].shape);
+                geojsons.push(geojson);
+                geojson.id=response.data[i].objectid;
+                geojson.dlmc=response.data[i].dlmc;
             }
             var layer = L.geoJson(geojsons, {
                 style: myStyle1,
                 onEachFeature: onEachFeature
             }).addTo(map);
         function onEachFeature(feature, layer) {
-            var popupContent = "<p>Leaflet Load WKT " +
-                feature.type + "</p>";
+            var popupContent = "<p>id:" +
+                feature.id + "</p>"+"<p>用地类型："+feature.dlmc+"</p>";
             if (feature.properties && feature.properties.popupContent) {
                 popupContent += feature.properties.popupContent;
             }
             layer.bindPopup(popupContent);
         }
-  });
+        }
+        else{
+    var ciLayer = L.canvasIconLayer({}).addTo(map);
+       var geojsons = [];
+       var markers = [];
+       for (var i = 0; i < response.data.length; i++) {
+            var geojson = Terraformer.WKT.parse(response.data[i].shape);
+            var layer = L.geoJson(geojson, {});
+            var temp=response.data[i].objectid;
+            var marker = L.marker(layer.getBounds().getCenter(), {icon: redIcon,title:response.data[i].objectid}).bindPopup("id:"+temp)
+            markers.push(marker);
+        }
+        ciLayer.addLayers(markers);
+        map.setView(map.getCenter());
+        ciLayer.addOnClickListener(function (e, data) {
+        console.log("click", data[0].data.options.title);
+        var id=data[0].data.options.title;
+        axios({
+        method:'GET',
+        url:'http://172.16.83.176:8808/polygon/getMyPolygonById?tempid='+id,
+        }).then(response=>{
+        console.log(response);
+        var geojson = Terraformer.WKT.parse(response.data.shape);
+        var layer = L.geoJson(geojson, {
+                style: myStyle3
+             }).addTo(map);
+    });
+});
+}
+});
 }
 //多边形裁剪
 btns[5].onclick=function(){
   axios({
     method:'GET',
-    url:'http://localhost:8808/polygon/getPolygonByClipping?wkt='+wktString,
+    url:'http://172.16.83.176:8808/polygon/getPolygonByClipping?wkt='+wktString,
   }).then(response=>{
     console.log(response);
+    if(response.data.length<10000){
     var geojsons = []
             for (var i = 0; i < response.data.length; i++) {
-                var geojson = Terraformer.WKT.parse(response.data[i]);
-                geojsons.push(geojson)
+                var geojson = Terraformer.WKT.parse(response.data[i].shape);
+                geojsons.push(geojson);
+                geojson.id=response.data[i].objectid;
+                geojson.dlmc=response.data[i].dlmc;
             }
             var layer = L.geoJson(geojsons, {
                 style: myStyle2,
                 onEachFeature: onEachFeature
             }).addTo(map);
         function onEachFeature(feature, layer) {
-            var popupContent = "<p>Leaflet Load WKT " +
-                feature.type + "</p>";
+            var popupContent = "<p>id:" +
+                feature.id + "</p>"+"<p>用地类型："+feature.dlmc+"</p>";
             if (feature.properties && feature.properties.popupContent) {
                 popupContent += feature.properties.popupContent;
             }
             layer.bindPopup(popupContent);
+        }
+        }
+       else{
+       var ciLayer = L.canvasIconLayer({}).addTo(map);
+       var geojsons = [];
+       var markers = [];
+       for (var i = 0; i < response.data.length; i++) {
+            var geojson = Terraformer.WKT.parse(response.data[i].shape);
+            var layer = L.geoJson(geojson, {});
+            var temp=response.data[i].objectid;
+            var marker = L.marker(layer.getBounds().getCenter(), {icon: greenIcon,title:response.data[i].objectid}).bindPopup("id:"+temp)
+            markers.push(marker);
+        }
+        ciLayer.addLayers(markers);
+        map.setView(map.getCenter());
+        ciLayer.addOnClickListener(function (e, data) {
+        console.log("click", data[0].data.options.title);
+        var id=data[0].data.options.title;
+        axios({
+        method:'GET',
+        url:'http://172.16.83.176:8808/polygon/getMyPolygonByIdNew?tempid='+id,
+        }).then(response=>{
+        console.log(response);
+        var geojson = Terraformer.WKT.parse(response.data.shape);
+        var layer = L.geoJson(geojson, {
+                style: myStyle3
+             }).addTo(map);
+    });
+});
         }
   });
 }
@@ -326,7 +366,7 @@ btns[6].onclick=function(){
 var dlmc=document.getElementById("field2").value;
   axios({
     method:'GET',
-    url:'http://localhost:8808/polygon/getPolygonByUnion?dlmc='+dlmc,
+    url:'http://172.16.83.176:8808/polygon/getPolygonByUnion?dlmc='+dlmc,
   }).then(response=>{
     console.log(response);
     var geojsons = [];
@@ -349,7 +389,7 @@ var dlmc=document.getElementById("field2").value;
 function demo(){
   var responsecontent;
   // 向给定ID的用户发起请求
-  axios.get('http://localhost:8808/point/getByName?name=包子')
+  axios.get('http://172.16.83.176:8808/point/getByName?name=包子')
     .then(function (response) {
       // 处理成功情况
       console.log(response);

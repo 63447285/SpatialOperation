@@ -5,8 +5,6 @@ import com.example.spatialoperation.service.PointService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-
 import java.util.List;
 
 @RestController
@@ -20,8 +18,8 @@ public class PointController {
     };
 
     @RequestMapping("/point/getByName")
-    public List<MyPoint> getByName(String name){
-        return pointService.getPointByName(name);
+    public List<MyPoint> getByName(String dlmc){
+        return pointService.getPointByName(dlmc);
     }
 
     @RequestMapping("/point/getPointsGeometry")

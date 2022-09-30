@@ -42,7 +42,7 @@ public class PolygonService {
     }
 
     public MyPolygon getPolygonByID(int id){
-        return polygonMapper.getMyPolygonByID(id);
+        return polygonMapper.getPolygonByID(id);
     }
 
 
@@ -121,12 +121,9 @@ public class PolygonService {
 
     //使用postgis空间索引
     //相交
-    public List<String> getPolygonByIntersects(String wkt,int index,int num) throws ParseException {
+    public List<MyPolygon> getPolygonByIntersects(String wkt,int index,int num) throws ParseException {
         StopWatch watch = new StopWatch();
         watch.start();
-//      KmeanPolygonSplitCore kmeanPolygonSplitCore=new KmeanPolygonSplitCore();
-//      KmeanPolygonResult kmeanPolygonResult=kmeanPolygonSplitCore.splitPolygon(wkt,1000,10);
-//      List<Geometry> geometries=kmeanPolygonResult.getVoronoi();
         Geometry g=new WKTReader().read(wkt);
         final Envelope envelope = g.getEnvelopeInternal();
         double minX = envelope.getMinX();
@@ -148,11 +145,10 @@ public class PolygonService {
         String wktlr = writer.write(lr);
         String wktul = writer.write(ul);
         String wktur = writer.write(ur);
-        List<String> myPolygonList1;
-        List<String> myPolygonList2;
-        List<String> myPolygonList3;
-        List<String> myPolygonList4;
-        List<List<String>> results=new ArrayList<>();
+        List<MyPolygon> myPolygonList1;
+        List<MyPolygon> myPolygonList2;
+        List<MyPolygon> myPolygonList3;
+        List<MyPolygon> myPolygonList4;
         myPolygonList1=polygonMapper.getPolygonByIntersects(wktll,index,num);
         myPolygonList2=polygonMapper.getPolygonByIntersects(wktlr,index,num);
         myPolygonList3=polygonMapper.getPolygonByIntersects(wktul,index,num);
@@ -166,46 +162,46 @@ public class PolygonService {
         return collect;
     }
     //裁剪
-    public List<String> getPolygonByClipping(String wkt,int index,int num) throws ParseException {
+    public List<MyPolygon> getPolygonByClipping(String wkt,int index,int num) throws ParseException {
         StopWatch watch = new StopWatch();
         watch.start();
         Geometry g=new WKTReader().read(wkt);
-        final Envelope envelope = g.getEnvelopeInternal();
-        double minX = envelope.getMinX();
-        double maxX = envelope.getMaxX();
-        double midX = minX + (maxX - minX) / 2.0;
-        double minY = envelope.getMinY();
-        double maxY = envelope.getMaxY();
-        double midY = minY + (maxY - minY) / 2.0;
-        Envelope llEnv = new Envelope(minX, midX, minY, midY);
-        Envelope lrEnv = new Envelope(midX, maxX, minY, midY);
-        Envelope ulEnv = new Envelope(minX, midX, midY, maxY);
-        Envelope urEnv = new Envelope(midX, maxX, midY, maxY);
-        Geometry ll = JTS.toGeometry(llEnv).intersection(g);
-        Geometry lr = JTS.toGeometry(lrEnv).intersection(g);
-        Geometry ul = JTS.toGeometry(ulEnv).intersection(g);
-        Geometry ur = JTS.toGeometry(urEnv).intersection(g);
-        WKTWriter writer = new WKTWriter(2);
-        String wktll = writer.write(ll);
-        String wktlr = writer.write(lr);
-        String wktul = writer.write(ul);
-        String wktur = writer.write(ur);
-        List<String> myPolygonList1;
-        List<String> myPolygonList2;
-        List<String> myPolygonList3;
-        List<String> myPolygonList4;
-        List<List<String>> results=new ArrayList<>();
-        myPolygonList1=polygonMapper.getPolygonByClipping(wktll,index,num);
-        myPolygonList2=polygonMapper.getPolygonByClipping(wktlr,index,num);
-        myPolygonList3=polygonMapper.getPolygonByClipping(wktul,index,num);
-        myPolygonList4=polygonMapper.getPolygonByClipping(wktur,index,num);
-        List collect = Stream.of(myPolygonList1,myPolygonList2,myPolygonList3,myPolygonList4)
-                .flatMap(Collection::stream)
-                .distinct()
-                .collect(Collectors.toList());
+//        final Envelope envelope = g.getEnvelopeInternal();
+//        double minX = envelope.getMinX();
+//        double maxX = envelope.getMaxX();
+//        double midX = minX + (maxX - minX) / 2.0;
+//        double minY = envelope.getMinY();
+//        double maxY = envelope.getMaxY();
+//        double midY = minY + (maxY - minY) / 2.0;
+//        Envelope llEnv = new Envelope(minX, midX, minY, midY);
+//        Envelope lrEnv = new Envelope(midX, maxX, minY, midY);
+//        Envelope ulEnv = new Envelope(minX, midX, midY, maxY);
+//        Envelope urEnv = new Envelope(midX, maxX, midY, maxY);
+//        Geometry ll = JTS.toGeometry(llEnv).intersection(g);
+//        Geometry lr = JTS.toGeometry(lrEnv).intersection(g);
+//        Geometry ul = JTS.toGeometry(ulEnv).intersection(g);
+//        Geometry ur = JTS.toGeometry(urEnv).intersection(g);
+//        WKTWriter writer = new WKTWriter(2);
+//        String wktll = writer.write(ll);
+//        String wktlr = writer.write(lr);
+//        String wktul = writer.write(ul);
+//        String wktur = writer.write(ur);
+        List<MyPolygon> myPolygonList1;
+//        List<MyPolygon> myPolygonList2;
+//        List<MyPolygon> myPolygonList3;
+//        List<MyPolygon> myPolygonList4;
+//        myPolygonList1=polygonMapper.getPolygonByClipping(wktll,index,num);
+//        myPolygonList2=polygonMapper.getPolygonByClipping(wktlr,index,num);
+//        myPolygonList3=polygonMapper.getPolygonByClipping(wktul,index,num);
+//        myPolygonList4=polygonMapper.getPolygonByClipping(wktur,index,num);
+//        List collect = Stream.of(myPolygonList1,myPolygonList2,myPolygonList3,myPolygonList4)
+//                .flatMap(Collection::stream)
+//                .distinct()
+//                .collect(Collectors.toList());
+      myPolygonList1=polygonMapper.getPolygonByClipping(wkt,index,num);
         watch.stop();
         log.info("使用空间索引语句多边形裁剪耗时：{} s", new DecimalFormat("#.000").format(watch.getTotalTimeSeconds()));
-        return collect;
+        return myPolygonList1;
     }
 
     public String getUnionGeometry(int index,int num,String dlmc) throws ParseException {
@@ -219,7 +215,27 @@ public class PolygonService {
     }
 
 
-    public void insert(MyPolygon myPolygon) {
-        polygonMapper.insertPolygon(myPolygon);
+    public void insert1(MyPolygon myPolygon) {
+        polygonMapper.insertPolygon1(myPolygon);
     }
+
+    public MyPolygon getMyPolygonById(int id) {
+        return polygonMapper.getMyPolygonById(id);
+    }
+
+    public MyPolygon getMyPolygonByIdNew(int id) {return polygonMapper.getMyPolygonByIdNew(id);}
+
+    public void insert2(MyPolygon myPolygon) {
+        polygonMapper.insertPolygon2(myPolygon);
+    }
+
+    public void deletePolygon1(){
+        polygonMapper.deletePolygon1();
+    }
+
+    public void deletePolygon2(){
+        polygonMapper.deletePolygon2();
+    }
+
+
 }

@@ -4,23 +4,45 @@
     <select id="getAllPolygonGeometry" fetchSize="1000" resultType="java.lang.String">
         SELECT ST_AsText(shape) FROM dltb2019 LIMIT #{num} OFFSET #{index}
     </select>
-    <select id="getMyPolygonByID" resultType="com.example.spatialoperation.entity.MyPolygon">
+    <select id="getPolygonByID" resultType="com.example.spatialoperation.entity.MyPolygon">
         SELECT gw_objectcid,st_astext(gw_shape),dlmc FROM dltb121604 WHERE gw_objectcid=#{id}
     </select>
     <select id="getPolygonsGeometryByDlmc" resultType="java.lang.String">
         SELECT st_astext(gw_shape) FROM dltb121604 WHERE dlmc=#{dlmc}
     </select>
-    <select id="getPolygonByIntersects" fetchSize="10000" resultType="java.lang.String">
-        SELECT st_astext(shape) FROM dltb2019 WHERE ST_Intersects(CAST(shape AS geometry), CAST('SRID=4490;'||#{wkt} AS geometry)) LIMIT #{num} OFFSET #{index}
+    <select id="getPolygonByIntersects" fetchSize="10000" resultType="com.example.spatialoperation.entity.MyPolygon">
+        SELECT objectid,st_astext(shape),dlmc FROM mydltb WHERE ST_Intersects(CAST(shape AS geometry), CAST('SRID=4490;'||#{wkt} AS geometry)) LIMIT #{num} OFFSET #{index}
     </select>
-    <select id="getPolygonByClipping" fetchSize="100" resultType="java.lang.String">
-        SELECT st_astext(ST_Intersection(CAST(shape AS geometry), CAST('SRID=4490;'||#{wkt} AS geometry))) FROM dltb2019 WHERE ST_Intersects(CAST(shape AS geometry), CAST('SRID=4490;'||#{wkt} AS geometry)) LIMIT #{num} OFFSET #{index}
+    <select id="getPolygonByClipping" fetchSize="10000" resultType="com.example.spatialoperation.entity.MyPolygon">
+        SELECT objectid,st_astext(ST_Intersection(CAST(shape AS geometry), CAST('SRID=4490;'||#{wkt} AS geometry))),dlmc FROM mydltb WHERE ST_Intersects(CAST(shape AS geometry), CAST('SRID=4490;'||#{wkt} AS geometry)) AND  ST_IsValid(shape) = true LIMIT #{num} OFFSET #{index}
     </select>
     <select id="getPolygonByUnion" fetchSize="10000" resultType="java.lang.String">
-        SELECT st_astext(ST_Union(ST_Buffer(shape,0.001))) FROM dltb2019 WHERE dlmc=#{dlmc} LIMIT #{num} OFFSET #{index}
+        SELECT st_astext(ST_Union(ST_Buffer(shape,0.001))) FROM mydltb WHERE dlmc=#{dlmc} LIMIT #{num} OFFSET #{index}
     </select>
-    <insert id="insertPolygon" parameterType="com.example.spatialoperation.entity.MyPolygon">
-        INSERT INTO  dltb_intersect(objectid,shape,dlmc)
+
+    <insert id="insertPolygon1" parameterType="com.example.spatialoperation.entity.MyPolygon">
+        INSERT INTO dltb_intersect(objectid,shape,dlmc)
         VALUES (#{objectid},st_geomfromtext(#{shape},4490),#{dlmc})
     </insert>
+
+    <insert id="insertPolygon2" parameterType="com.example.spatialoperation.entity.MyPolygon">
+        INSERT INTO dltb_clip(objectid,shape,dlmc)
+        VALUES (#{objectid},st_geomfromtext(#{shape},4490),#{dlmc})
+    </insert>
+
+    <delete id="deletePolygon1">
+        DELETE FROM dltb_intersect  WHERE 1=1
+    </delete>
+
+    <delete id="deletePolygon2">
+        DELETE FROM dltb_clip  WHERE 1=1
+    </delete>
+
+    <select id="getMyPolygonById" resultType="com.example.spatialoperation.entity.MyPolygon">
+        SELECT objectid,st_astext(shape),dlmc FROM dltb_intersect WHERE objectid=#{id}
+    </select>
+
+    <select id="getMyPolygonByIdNew" resultType="com.example.spatialoperation.entity.MyPolygon">
+        SELECT objectid,st_astext(shape),dlmc FROM dltb_clip WHERE objectid=#{id}
+    </select>
 </mapper>
